@@ -11,6 +11,7 @@ COLS = 30
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 tile = pygame.image.load('tile32x32.png').convert_alpha()
+tiles = []
 
 u = (1,-1)
 v = (0.5,0.5)
@@ -69,10 +70,16 @@ def inv_matrix(a,b,c,d):
   det = 1/(a*d-b*c)
   return ((det*d, det*(-b)), (det*(-c),det*a))
 
+def contains(lst,vect):
+  for e in lst:
+    if e[0] == vect[0] and e[1] == vect[1]:
+      return True
+  return False
+
 def draw_grid(n:int):
-  for i in range(n):
-    for j in range(n):
-      px, py = proj((i, j))
+  tiles.sort(key=lambda t: (t[1], t[0]))
+  for t in tiles:
+      px, py = proj((t[0], t[1]))
       # shift so the diamond is centered on proj
       screen.blit(tile, (px - TILE_SIZE // 2, py - TILE_HEIGHT / 2)) # finally working it needed to shift down by TILE_HEIGHT / 2 so by a fourth of tile_size
 
@@ -87,7 +94,10 @@ while running:
     running = False
   
   if pygame.mouse.get_just_pressed()[0]:
-    print(inv_proj(pygame.mouse.get_pos()))
+    tuile = inv_proj(pygame.mouse.get_pos())
+    print(tuile)
+    if not contains(tiles,tuile):
+      tiles.append(tuile)
   
   screen.fill('black')
   draw_grid(ROWS)
