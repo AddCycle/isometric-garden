@@ -5,8 +5,8 @@ WIDTH = 1280
 HEIGHT = 720
 TILE_SIZE = 32
 TILE_HEIGHT = TILE_SIZE / 2
-ROWS = 10
-COLS = 10
+ROWS = 30
+COLS = 30
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -34,6 +34,23 @@ def draw_tile_outline_mask(vect, color=(255,0,0)):
     # offset each point by the tile position
     points = [(x + top_left[0], y + top_left[1]) for x,y in mask_outline]
     
+    pygame.draw.polygon(screen, color, points, 2)
+
+def draw_tile_top_outline(vect, color=(255,0,0)):
+    i,j = vect
+    px, py = proj((i,j))
+    # shift to match blit
+    px -= TILE_SIZE // 2
+    py -= TILE_HEIGHT / 2
+
+    # define the diamond (top face) points
+    points = [
+        (px + TILE_SIZE // 2, py),             # top middle
+        (px + TILE_SIZE, py + TILE_HEIGHT // 2), # right
+        (px + TILE_SIZE // 2, py + TILE_HEIGHT), # bottom
+        (px, py + TILE_HEIGHT // 2)             # left
+    ]
+
     pygame.draw.polygon(screen, color, points, 2)
 
 def inv_proj(vect:tuple[float,float]):
@@ -73,8 +90,8 @@ while running:
     print(inv_proj(pygame.mouse.get_pos()))
   
   screen.fill('black')
-  draw_grid(10)
-  draw_tile_outline_mask(inv_proj(pygame.mouse.get_pos()))
+  draw_grid(ROWS)
+  draw_tile_top_outline(inv_proj(pygame.mouse.get_pos()))
 
   pygame.display.update()
 
