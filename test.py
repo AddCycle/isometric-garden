@@ -77,13 +77,17 @@ def contains(lst,vect):
   return False
 
 def draw_grid(n:int):
-  tiles.sort(key=lambda t: (t[1], t[0]))
-  for t in tiles:
-      px, py = proj((t[0], t[1]))
+  # tiles.sort(key=lambda t: (t[1], t[0]))
+  # for t in tiles:
+  #     px, py = proj((t[0], t[1]))
+  for i in range(n):
+    for j in range(n):
+      px, py = proj((i, j))
       # shift so the diamond is centered on proj
       screen.blit(tile, (px - TILE_SIZE // 2, py - TILE_HEIGHT / 2)) # finally working it needed to shift down by TILE_HEIGHT / 2 so by a fourth of tile_size
 
 running = True
+highlight_tile = proj((0,0))
 while running:
   for event in pygame.event.get():
     if event.type == pygame.QUIT:
@@ -93,15 +97,48 @@ while running:
   if keys[pygame.K_ESCAPE]:
     running = False
   
-  if pygame.mouse.get_just_pressed()[0]:
-    tuile = inv_proj(pygame.mouse.get_pos())
+  if keys[pygame.K_SPACE]:
+    tuile = inv_proj(highlight_tile)
     print(tuile)
     if not contains(tiles,tuile):
       tiles.append(tuile)
+
+  if keys[pygame.K_LEFT]:
+    x,y = inv_proj(highlight_tile)
+    x -= 1
+    highlight_tile = proj((x,y))
+    print((x,y))
+  
+  if keys[pygame.K_RIGHT]:
+    x,y = inv_proj(highlight_tile)
+    x += 1
+    highlight_tile = proj((x,y))
+    print((x,y))
+
+  if keys[pygame.K_DOWN]:
+    x,y = inv_proj(highlight_tile)
+    y += 1
+    highlight_tile = proj((x,y))
+    print((x,y))
+
+  if keys[pygame.K_UP]:
+    x,y = inv_proj(highlight_tile)
+    y -= 1
+    highlight_tile = proj((x,y))
+    print((x,y))
+  
+  if pygame.mouse.get_just_pressed()[0]:
+    tuile = inv_proj(pygame.mouse.get_pos())
+    highlight_tile = proj(tuile)
+    print(tuile)
+    # highlight_tile = (x,y)
+    # if not contains(tiles,tuile):
+    #   tiles.append(tuile)
   
   screen.fill('black')
   draw_grid(ROWS)
   draw_tile_top_outline(inv_proj(pygame.mouse.get_pos()))
+  draw_tile_top_outline(inv_proj(highlight_tile), (0,255,0))
 
   pygame.display.update()
 
