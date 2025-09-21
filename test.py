@@ -11,6 +11,8 @@ COLS = 30
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 tile = pygame.image.load('tile32x32.png').convert_alpha()
+ball = pygame.image.load('ball32x32.png').convert_alpha()
+ball_pos = (0,0)
 tiles = []
 
 u = (1,-1)
@@ -86,6 +88,15 @@ def draw_grid(n:int):
       # shift so the diamond is centered on proj
       screen.blit(tile, (px - TILE_SIZE // 2, py - TILE_HEIGHT / 2)) # finally working it needed to shift down by TILE_HEIGHT / 2 so by a fourth of tile_size
 
+def draw_ball(vect:tuple[float,float]):
+  i,j = vect
+  px, py = proj((i, j))
+  screen.blit(ball, (px - TILE_SIZE / 2, py - TILE_HEIGHT * 1.5))
+
+def move_ball(vect:tuple[float,float]):
+  global ball_pos
+  ball_pos = vect
+
 running = True
 highlight_tile = proj((0,0))
 while running:
@@ -104,41 +115,63 @@ while running:
       tiles.append(tuile)
 
   if keys[pygame.K_LEFT]:
+    # highlighted tile
     x,y = inv_proj(highlight_tile)
     x -= 1
     highlight_tile = proj((x,y))
+
+    # ball
+    x_,y_ = ball_pos
+    x_ -= 1
+    ball_pos = (x_, y_)
     print((x,y))
   
   if keys[pygame.K_RIGHT]:
     x,y = inv_proj(highlight_tile)
     x += 1
     highlight_tile = proj((x,y))
+
+    # ball
+    x_,y_ = ball_pos
+    x_ += 1
+    ball_pos = (x_, y_)
     print((x,y))
 
   if keys[pygame.K_DOWN]:
     x,y = inv_proj(highlight_tile)
     y += 1
     highlight_tile = proj((x,y))
+
+    # ball
+    x_,y_ = ball_pos
+    y_ += 1
+    ball_pos = (x_, y_)
     print((x,y))
 
   if keys[pygame.K_UP]:
     x,y = inv_proj(highlight_tile)
     y -= 1
     highlight_tile = proj((x,y))
+
+    # ball
+    x_,y_ = ball_pos
+    y_ -= 1
+    ball_pos = (x_, y_)
     print((x,y))
   
   if pygame.mouse.get_just_pressed()[0]:
     tuile = inv_proj(pygame.mouse.get_pos())
-    highlight_tile = proj(tuile)
-    print(tuile)
-    # highlight_tile = (x,y)
-    # if not contains(tiles,tuile):
-    #   tiles.append(tuile)
+    x,y = tuile
+    if x >= 0 and x < ROWS and y >= 0 and y < ROWS:
+      highlight_tile = proj(tuile)
+      move_ball(tuile)
+      print(tuile)
   
   screen.fill('black')
   draw_grid(ROWS)
   draw_tile_top_outline(inv_proj(pygame.mouse.get_pos()))
   draw_tile_top_outline(inv_proj(highlight_tile), (0,255,0))
+  draw_ball(ball_pos)
 
   pygame.display.update()
 
